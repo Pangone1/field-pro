@@ -10,14 +10,34 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BackupsRouteImport } from './routes/backups'
+import { Route as ExpensesRouteImport } from './routes/expenses'
+import { Route as MileageRouteImport } from './routes/mileage'
 import { Route as ScheduleRouteImport } from './routes/schedule'
 import { Route as EstimatesIndexRouteImport } from './routes/estimates.index'
 import { Route as EstimatesEstimateIdRouteImport } from './routes/estimates.$estimateId'
+import { Route as InvoicesIndexRouteImport } from './routes/invoices.index'
+import { Route as InvoicesInvoiceIdRouteImport } from './routes/invoices.$invoiceId'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BackupsRoute = BackupsRouteImport.update({
+  id: '/backups',
+  path: '/backups',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExpensesRoute = ExpensesRouteImport.update({
+  id: '/expenses',
+  path: '/expenses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MileageRoute = MileageRouteImport.update({
+  id: '/mileage',
+  path: '/mileage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScheduleRoute = ScheduleRouteImport.update({
@@ -35,6 +55,16 @@ const EstimatesEstimateIdRoute = EstimatesEstimateIdRouteImport.update({
   path: '/estimates/$estimateId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvoicesIndexRoute = InvoicesIndexRouteImport.update({
+  id: '/invoices/',
+  path: '/invoices/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvoicesInvoiceIdRoute = InvoicesInvoiceIdRouteImport.update({
+  id: '/invoices/$invoiceId',
+  path: '/invoices/$invoiceId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JobsJobIdRoute = JobsJobIdRouteImport.update({
   id: '/jobs/$jobId',
   path: '/jobs/$jobId',
@@ -43,52 +73,91 @@ const JobsJobIdRoute = JobsJobIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/backups': typeof BackupsRoute
+  '/expenses': typeof ExpensesRoute
+  '/mileage': typeof MileageRoute
   '/schedule': typeof ScheduleRoute
   '/estimates/$estimateId': typeof EstimatesEstimateIdRoute
+  '/invoices/$invoiceId': typeof InvoicesInvoiceIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/estimates/': typeof EstimatesIndexRoute
+  '/invoices/': typeof InvoicesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/backups': typeof BackupsRoute
+  '/expenses': typeof ExpensesRoute
+  '/mileage': typeof MileageRoute
   '/schedule': typeof ScheduleRoute
   '/estimates/$estimateId': typeof EstimatesEstimateIdRoute
+  '/invoices/$invoiceId': typeof InvoicesInvoiceIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/estimates': typeof EstimatesIndexRoute
+  '/invoices': typeof InvoicesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/backups': typeof BackupsRoute
+  '/expenses': typeof ExpensesRoute
+  '/mileage': typeof MileageRoute
   '/schedule': typeof ScheduleRoute
   '/estimates/$estimateId': typeof EstimatesEstimateIdRoute
+  '/invoices/$invoiceId': typeof InvoicesInvoiceIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/estimates/': typeof EstimatesIndexRoute
+  '/invoices/': typeof InvoicesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/backups'
+    | '/expenses'
+    | '/mileage'
     | '/schedule'
     | '/estimates/$estimateId'
+    | '/invoices/$invoiceId'
     | '/jobs/$jobId'
     | '/estimates/'
+    | '/invoices/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/schedule' | '/estimates/$estimateId' | '/jobs/$jobId' | '/estimates'
+    | '/'
+    | '/backups'
+    | '/expenses'
+    | '/mileage'
+    | '/schedule'
+    | '/estimates/$estimateId'
+    | '/invoices/$invoiceId'
+    | '/jobs/$jobId'
+    | '/estimates'
+    | '/invoices'
   id:
     | '__root__'
     | '/'
+    | '/backups'
+    | '/expenses'
+    | '/mileage'
     | '/schedule'
     | '/estimates/$estimateId'
+    | '/invoices/$invoiceId'
     | '/jobs/$jobId'
     | '/estimates/'
+    | '/invoices/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BackupsRoute: typeof BackupsRoute
+  ExpensesRoute: typeof ExpensesRoute
+  MileageRoute: typeof MileageRoute
   ScheduleRoute: typeof ScheduleRoute
   EstimatesEstimateIdRoute: typeof EstimatesEstimateIdRoute
+  InvoicesInvoiceIdRoute: typeof InvoicesInvoiceIdRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
   EstimatesIndexRoute: typeof EstimatesIndexRoute
+  InvoicesIndexRoute: typeof InvoicesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -98,6 +167,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/backups': {
+      id: '/backups'
+      path: '/backups'
+      fullPath: '/backups'
+      preLoaderRoute: typeof BackupsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/expenses': {
+      id: '/expenses'
+      path: '/expenses'
+      fullPath: '/expenses'
+      preLoaderRoute: typeof ExpensesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mileage': {
+      id: '/mileage'
+      path: '/mileage'
+      fullPath: '/mileage'
+      preLoaderRoute: typeof MileageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/schedule': {
@@ -121,6 +211,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EstimatesEstimateIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/invoices/': {
+      id: '/invoices/'
+      path: '/invoices'
+      fullPath: '/invoices/'
+      preLoaderRoute: typeof InvoicesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invoices/$invoiceId': {
+      id: '/invoices/$invoiceId'
+      path: '/invoices/$invoiceId'
+      fullPath: '/invoices/$invoiceId'
+      preLoaderRoute: typeof InvoicesInvoiceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/jobs/$jobId': {
       id: '/jobs/$jobId'
       path: '/jobs/$jobId'
@@ -133,10 +237,15 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BackupsRoute: BackupsRoute,
+  ExpensesRoute: ExpensesRoute,
+  MileageRoute: MileageRoute,
   ScheduleRoute: ScheduleRoute,
   EstimatesEstimateIdRoute: EstimatesEstimateIdRoute,
+  InvoicesInvoiceIdRoute: InvoicesInvoiceIdRoute,
   JobsJobIdRoute: JobsJobIdRoute,
   EstimatesIndexRoute: EstimatesIndexRoute,
+  InvoicesIndexRoute: InvoicesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
