@@ -1,0 +1,16 @@
+{
+  "name": "FieldPro — Solo Contractor",
+  "short_name": "FieldPro",
+  "description": "Jobs, estimates, payments, mileage and time tracking for solo field service contractors.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1b1e25",
+  "theme_color": "#1b1e25",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
