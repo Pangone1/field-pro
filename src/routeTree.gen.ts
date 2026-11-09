@@ -10,11 +10,29 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ScheduleRouteImport } from './routes/schedule'
+import { Route as EstimatesIndexRouteImport } from './routes/estimates.index'
+import { Route as EstimatesEstimateIdRouteImport } from './routes/estimates.$estimateId'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScheduleRoute = ScheduleRouteImport.update({
+  id: '/schedule',
+  path: '/schedule',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EstimatesIndexRoute = EstimatesIndexRouteImport.update({
+  id: '/estimates/',
+  path: '/estimates/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EstimatesEstimateIdRoute = EstimatesEstimateIdRouteImport.update({
+  id: '/estimates/$estimateId',
+  path: '/estimates/$estimateId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JobsJobIdRoute = JobsJobIdRouteImport.update({
@@ -25,28 +43,52 @@ const JobsJobIdRoute = JobsJobIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/schedule': typeof ScheduleRoute
+  '/estimates/$estimateId': typeof EstimatesEstimateIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/estimates/': typeof EstimatesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/schedule': typeof ScheduleRoute
+  '/estimates/$estimateId': typeof EstimatesEstimateIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/estimates': typeof EstimatesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/schedule': typeof ScheduleRoute
+  '/estimates/$estimateId': typeof EstimatesEstimateIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/estimates/': typeof EstimatesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/jobs/$jobId'
+  fullPaths:
+    | '/'
+    | '/schedule'
+    | '/estimates/$estimateId'
+    | '/jobs/$jobId'
+    | '/estimates/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/jobs/$jobId'
-  id: '__root__' | '/' | '/jobs/$jobId'
+  to:
+    '/' | '/schedule' | '/estimates/$estimateId' | '/jobs/$jobId' | '/estimates'
+  id:
+    | '__root__'
+    | '/'
+    | '/schedule'
+    | '/estimates/$estimateId'
+    | '/jobs/$jobId'
+    | '/estimates/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ScheduleRoute: typeof ScheduleRoute
+  EstimatesEstimateIdRoute: typeof EstimatesEstimateIdRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
+  EstimatesIndexRoute: typeof EstimatesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -56,6 +98,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/schedule': {
+      id: '/schedule'
+      path: '/schedule'
+      fullPath: '/schedule'
+      preLoaderRoute: typeof ScheduleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/estimates/': {
+      id: '/estimates/'
+      path: '/estimates'
+      fullPath: '/estimates/'
+      preLoaderRoute: typeof EstimatesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/estimates/$estimateId': {
+      id: '/estimates/$estimateId'
+      path: '/estimates/$estimateId'
+      fullPath: '/estimates/$estimateId'
+      preLoaderRoute: typeof EstimatesEstimateIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/jobs/$jobId': {
@@ -70,7 +133,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ScheduleRoute: ScheduleRoute,
+  EstimatesEstimateIdRoute: EstimatesEstimateIdRoute,
   JobsJobIdRoute: JobsJobIdRoute,
+  EstimatesIndexRoute: EstimatesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
