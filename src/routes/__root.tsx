@@ -12,6 +12,10 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { BottomNav } from "@/components/app/BottomNav";
+import { TopBar } from "@/components/app/TopBar";
+import { Toaster } from "@/components/ui/sonner";
+import { StoreProvider, useStore } from "@/lib/store";
 
 function NotFoundComponent() {
   return (
@@ -73,29 +77,43 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   );
 }
 
+const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('fieldpro-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})();`;
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
-    // Replace these placeholders with the app's name and description when first building the app.
-    // Each content route, / included, must still set its own head(). Never add og:image or
-    // twitter:image here: every page without its own would inherit the root's preview image.
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { title: "FieldPro — Solo Contractor Toolkit" },
+      {
+        name: "description",
+        content: "Jobs, estimates, payments, mileage and time tracking for solo field service contractors.",
+      },
+      { name: "author", content: "FieldPro" },
+      { name: "theme-color", content: "#1b1e25" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "FieldPro" },
+      { property: "og:title", content: "FieldPro — Solo Contractor Toolkit" },
+      {
+        property: "og:description",
+        content: "Jobs, estimates, payments, mileage and time tracking for solo field service contractors.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: appCss,
+        href: "https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..900&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
     ],
   }),
   shellComponent: RootShell,
@@ -106,8 +124,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <HeadContent />
       </head>
       <body>
@@ -118,13 +137,38 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function Splash() {
+  return (
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-background">
+      <img src="/icon-192.png" alt="" width={72} height={72} className="size-18 rounded-2xl" />
+      <div className="font-display text-lg font-extrabold">FieldPro</div>
+      <div className="h-1 w-24 overflow-hidden rounded-full bg-muted">
+        <div className="hazard-strip h-full w-full animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
+function AppToaster() {
+  const { theme } = useStore();
+  return <Toaster theme={theme} position="top-center" offset={64} />;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <StoreProvider splash={<Splash />}>
+        <div className="relative mx-auto min-h-dvh max-w-md bg-background sm:border-x">
+          <TopBar />
+          <main className="pb-28">
+            <Outlet />
+          </main>
+          <BottomNav />
+        </div>
+        <AppToaster />
+      </StoreProvider>
     </QueryClientProvider>
   );
 }
