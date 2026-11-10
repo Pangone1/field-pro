@@ -67,7 +67,8 @@ function JobDetailsPage() {
   const invoice = store.invoices.find((i) => i.jobId === job.id);
 
   const nextLabel: Record<JobStatus, string> = {
-    scheduled: "",
+    pending: "",
+    scheduled: "Confirm & schedule",
     en_route: "Start driving",
     in_progress: "Arrived — start work",
     completed: "Complete job",

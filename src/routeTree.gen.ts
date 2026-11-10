@@ -9,113 +9,117 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as BackupsRouteImport } from './routes/backups'
-import { Route as ExpensesRouteImport } from './routes/expenses'
-import { Route as MileageRouteImport } from './routes/mileage'
-import { Route as ScheduleRouteImport } from './routes/schedule'
-import { Route as EstimatesIndexRouteImport } from './routes/estimates.index'
-import { Route as EstimatesEstimateIdRouteImport } from './routes/estimates.$estimateId'
-import { Route as InvoicesIndexRouteImport } from './routes/invoices.index'
-import { Route as InvoicesInvoiceIdRouteImport } from './routes/invoices.$invoiceId'
-import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
+import { Route as AuthenticatedBackupsRouteImport } from './routes/_authenticated/backups'
+import { Route as AuthenticatedExpensesRouteImport } from './routes/_authenticated/expenses'
+import { Route as AuthenticatedMileageRouteImport } from './routes/_authenticated/mileage'
+import { Route as AuthenticatedScheduleRouteImport } from './routes/_authenticated/schedule'
+import { Route as AuthenticatedTodayRouteImport } from './routes/_authenticated/today'
+import { Route as AuthenticatedEstimatesIndexRouteImport } from './routes/_authenticated/estimates.index'
+import { Route as AuthenticatedEstimatesEstimateIdRouteImport } from './routes/_authenticated/estimates.$estimateId'
+import { Route as AuthenticatedInvoicesIndexRouteImport } from './routes/_authenticated/invoices.index'
+import { Route as AuthenticatedInvoicesInvoiceIdRouteImport } from './routes/_authenticated/invoices.$invoiceId'
+import { Route as AuthenticatedJobsJobIdRouteImport } from './routes/_authenticated/jobs.$jobId'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BackupsRoute = BackupsRouteImport.update({
-  id: '/backups',
+const AuthenticatedBackupsRoute = AuthenticatedBackupsRouteImport.update({
+  id: '/_authenticated/backups',
   path: '/backups',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExpensesRoute = ExpensesRouteImport.update({
-  id: '/expenses',
+const AuthenticatedExpensesRoute = AuthenticatedExpensesRouteImport.update({
+  id: '/_authenticated/expenses',
   path: '/expenses',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MileageRoute = MileageRouteImport.update({
-  id: '/mileage',
+const AuthenticatedMileageRoute = AuthenticatedMileageRouteImport.update({
+  id: '/_authenticated/mileage',
   path: '/mileage',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ScheduleRoute = ScheduleRouteImport.update({
-  id: '/schedule',
+const AuthenticatedScheduleRoute = AuthenticatedScheduleRouteImport.update({
+  id: '/_authenticated/schedule',
   path: '/schedule',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EstimatesIndexRoute = EstimatesIndexRouteImport.update({
-  id: '/estimates/',
-  path: '/estimates/',
+const AuthenticatedTodayRoute = AuthenticatedTodayRouteImport.update({
+  id: '/_authenticated/today',
+  path: '/today',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EstimatesEstimateIdRoute = EstimatesEstimateIdRouteImport.update({
-  id: '/estimates/$estimateId',
-  path: '/estimates/$estimateId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvoicesIndexRoute = InvoicesIndexRouteImport.update({
-  id: '/invoices/',
-  path: '/invoices/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvoicesInvoiceIdRoute = InvoicesInvoiceIdRouteImport.update({
-  id: '/invoices/$invoiceId',
-  path: '/invoices/$invoiceId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JobsJobIdRoute = JobsJobIdRouteImport.update({
-  id: '/jobs/$jobId',
+const AuthenticatedEstimatesIndexRoute =
+  AuthenticatedEstimatesIndexRouteImport.update({
+    id: '/_authenticated/estimates/',
+    path: '/estimates/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedEstimatesEstimateIdRoute =
+  AuthenticatedEstimatesEstimateIdRouteImport.update({
+    id: '/_authenticated/estimates/$estimateId',
+    path: '/estimates/$estimateId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedInvoicesIndexRoute =
+  AuthenticatedInvoicesIndexRouteImport.update({
+    id: '/_authenticated/invoices/',
+    path: '/invoices/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedInvoicesInvoiceIdRoute =
+  AuthenticatedInvoicesInvoiceIdRouteImport.update({
+    id: '/_authenticated/invoices/$invoiceId',
+    path: '/invoices/$invoiceId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedJobsJobIdRoute = AuthenticatedJobsJobIdRouteImport.update({
+  id: '/_authenticated/jobs/$jobId',
   path: '/jobs/$jobId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/backups': typeof BackupsRoute
-  '/expenses': typeof ExpensesRoute
-  '/mileage': typeof MileageRoute
-  '/schedule': typeof ScheduleRoute
-  '/estimates/$estimateId': typeof EstimatesEstimateIdRoute
-  '/invoices/$invoiceId': typeof InvoicesInvoiceIdRoute
-  '/jobs/$jobId': typeof JobsJobIdRoute
-  '/estimates/': typeof EstimatesIndexRoute
-  '/invoices/': typeof InvoicesIndexRoute
+  '/backups': typeof AuthenticatedBackupsRoute
+  '/expenses': typeof AuthenticatedExpensesRoute
+  '/mileage': typeof AuthenticatedMileageRoute
+  '/schedule': typeof AuthenticatedScheduleRoute
+  '/today': typeof AuthenticatedTodayRoute
+  '/estimates/$estimateId': typeof AuthenticatedEstimatesEstimateIdRoute
+  '/invoices/$invoiceId': typeof AuthenticatedInvoicesInvoiceIdRoute
+  '/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
+  '/estimates/': typeof AuthenticatedEstimatesIndexRoute
+  '/invoices/': typeof AuthenticatedInvoicesIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/backups': typeof BackupsRoute
-  '/expenses': typeof ExpensesRoute
-  '/mileage': typeof MileageRoute
-  '/schedule': typeof ScheduleRoute
-  '/estimates/$estimateId': typeof EstimatesEstimateIdRoute
-  '/invoices/$invoiceId': typeof InvoicesInvoiceIdRoute
-  '/jobs/$jobId': typeof JobsJobIdRoute
-  '/estimates': typeof EstimatesIndexRoute
-  '/invoices': typeof InvoicesIndexRoute
+  '/backups': typeof AuthenticatedBackupsRoute
+  '/expenses': typeof AuthenticatedExpensesRoute
+  '/mileage': typeof AuthenticatedMileageRoute
+  '/schedule': typeof AuthenticatedScheduleRoute
+  '/today': typeof AuthenticatedTodayRoute
+  '/estimates/$estimateId': typeof AuthenticatedEstimatesEstimateIdRoute
+  '/invoices/$invoiceId': typeof AuthenticatedInvoicesInvoiceIdRoute
+  '/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
+  '/estimates': typeof AuthenticatedEstimatesIndexRoute
+  '/invoices': typeof AuthenticatedInvoicesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/backups': typeof BackupsRoute
-  '/expenses': typeof ExpensesRoute
-  '/mileage': typeof MileageRoute
-  '/schedule': typeof ScheduleRoute
-  '/estimates/$estimateId': typeof EstimatesEstimateIdRoute
-  '/invoices/$invoiceId': typeof InvoicesInvoiceIdRoute
-  '/jobs/$jobId': typeof JobsJobIdRoute
-  '/estimates/': typeof EstimatesIndexRoute
-  '/invoices/': typeof InvoicesIndexRoute
+  '/_authenticated/backups': typeof AuthenticatedBackupsRoute
+  '/_authenticated/expenses': typeof AuthenticatedExpensesRoute
+  '/_authenticated/mileage': typeof AuthenticatedMileageRoute
+  '/_authenticated/schedule': typeof AuthenticatedScheduleRoute
+  '/_authenticated/today': typeof AuthenticatedTodayRoute
+  '/_authenticated/estimates/$estimateId': typeof AuthenticatedEstimatesEstimateIdRoute
+  '/_authenticated/invoices/$invoiceId': typeof AuthenticatedInvoicesInvoiceIdRoute
+  '/_authenticated/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
+  '/_authenticated/estimates/': typeof AuthenticatedEstimatesIndexRoute
+  '/_authenticated/invoices/': typeof AuthenticatedInvoicesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/backups'
     | '/expenses'
     | '/mileage'
     | '/schedule'
+    | '/today'
     | '/estimates/$estimateId'
     | '/invoices/$invoiceId'
     | '/jobs/$jobId'
@@ -123,11 +127,11 @@ export interface FileRouteTypes {
     | '/invoices/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/backups'
     | '/expenses'
     | '/mileage'
     | '/schedule'
+    | '/today'
     | '/estimates/$estimateId'
     | '/invoices/$invoiceId'
     | '/jobs/$jobId'
@@ -135,117 +139,117 @@ export interface FileRouteTypes {
     | '/invoices'
   id:
     | '__root__'
-    | '/'
-    | '/backups'
-    | '/expenses'
-    | '/mileage'
-    | '/schedule'
-    | '/estimates/$estimateId'
-    | '/invoices/$invoiceId'
-    | '/jobs/$jobId'
-    | '/estimates/'
-    | '/invoices/'
+    | '/_authenticated/backups'
+    | '/_authenticated/expenses'
+    | '/_authenticated/mileage'
+    | '/_authenticated/schedule'
+    | '/_authenticated/today'
+    | '/_authenticated/estimates/$estimateId'
+    | '/_authenticated/invoices/$invoiceId'
+    | '/_authenticated/jobs/$jobId'
+    | '/_authenticated/estimates/'
+    | '/_authenticated/invoices/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  BackupsRoute: typeof BackupsRoute
-  ExpensesRoute: typeof ExpensesRoute
-  MileageRoute: typeof MileageRoute
-  ScheduleRoute: typeof ScheduleRoute
-  EstimatesEstimateIdRoute: typeof EstimatesEstimateIdRoute
-  InvoicesInvoiceIdRoute: typeof InvoicesInvoiceIdRoute
-  JobsJobIdRoute: typeof JobsJobIdRoute
-  EstimatesIndexRoute: typeof EstimatesIndexRoute
-  InvoicesIndexRoute: typeof InvoicesIndexRoute
+  AuthenticatedBackupsRoute: typeof AuthenticatedBackupsRoute
+  AuthenticatedExpensesRoute: typeof AuthenticatedExpensesRoute
+  AuthenticatedMileageRoute: typeof AuthenticatedMileageRoute
+  AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
+  AuthenticatedTodayRoute: typeof AuthenticatedTodayRoute
+  AuthenticatedEstimatesEstimateIdRoute: typeof AuthenticatedEstimatesEstimateIdRoute
+  AuthenticatedInvoicesInvoiceIdRoute: typeof AuthenticatedInvoicesInvoiceIdRoute
+  AuthenticatedJobsJobIdRoute: typeof AuthenticatedJobsJobIdRoute
+  AuthenticatedEstimatesIndexRoute: typeof AuthenticatedEstimatesIndexRoute
+  AuthenticatedInvoicesIndexRoute: typeof AuthenticatedInvoicesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/backups': {
-      id: '/backups'
+    '/_authenticated/backups': {
+      id: '/_authenticated/backups'
       path: '/backups'
       fullPath: '/backups'
-      preLoaderRoute: typeof BackupsRouteImport
+      preLoaderRoute: typeof AuthenticatedBackupsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/expenses': {
-      id: '/expenses'
+    '/_authenticated/expenses': {
+      id: '/_authenticated/expenses'
       path: '/expenses'
       fullPath: '/expenses'
-      preLoaderRoute: typeof ExpensesRouteImport
+      preLoaderRoute: typeof AuthenticatedExpensesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/mileage': {
-      id: '/mileage'
+    '/_authenticated/mileage': {
+      id: '/_authenticated/mileage'
       path: '/mileage'
       fullPath: '/mileage'
-      preLoaderRoute: typeof MileageRouteImport
+      preLoaderRoute: typeof AuthenticatedMileageRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/schedule': {
-      id: '/schedule'
+    '/_authenticated/schedule': {
+      id: '/_authenticated/schedule'
       path: '/schedule'
       fullPath: '/schedule'
-      preLoaderRoute: typeof ScheduleRouteImport
+      preLoaderRoute: typeof AuthenticatedScheduleRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/estimates/': {
-      id: '/estimates/'
+    '/_authenticated/today': {
+      id: '/_authenticated/today'
+      path: '/today'
+      fullPath: '/today'
+      preLoaderRoute: typeof AuthenticatedTodayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/estimates/': {
+      id: '/_authenticated/estimates/'
       path: '/estimates'
       fullPath: '/estimates/'
-      preLoaderRoute: typeof EstimatesIndexRouteImport
+      preLoaderRoute: typeof AuthenticatedEstimatesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/estimates/$estimateId': {
-      id: '/estimates/$estimateId'
+    '/_authenticated/estimates/$estimateId': {
+      id: '/_authenticated/estimates/$estimateId'
       path: '/estimates/$estimateId'
       fullPath: '/estimates/$estimateId'
-      preLoaderRoute: typeof EstimatesEstimateIdRouteImport
+      preLoaderRoute: typeof AuthenticatedEstimatesEstimateIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/invoices/': {
-      id: '/invoices/'
+    '/_authenticated/invoices/': {
+      id: '/_authenticated/invoices/'
       path: '/invoices'
       fullPath: '/invoices/'
-      preLoaderRoute: typeof InvoicesIndexRouteImport
+      preLoaderRoute: typeof AuthenticatedInvoicesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/invoices/$invoiceId': {
-      id: '/invoices/$invoiceId'
+    '/_authenticated/invoices/$invoiceId': {
+      id: '/_authenticated/invoices/$invoiceId'
       path: '/invoices/$invoiceId'
       fullPath: '/invoices/$invoiceId'
-      preLoaderRoute: typeof InvoicesInvoiceIdRouteImport
+      preLoaderRoute: typeof AuthenticatedInvoicesInvoiceIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/jobs/$jobId': {
-      id: '/jobs/$jobId'
+    '/_authenticated/jobs/$jobId': {
+      id: '/_authenticated/jobs/$jobId'
       path: '/jobs/$jobId'
       fullPath: '/jobs/$jobId'
-      preLoaderRoute: typeof JobsJobIdRouteImport
+      preLoaderRoute: typeof AuthenticatedJobsJobIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  BackupsRoute: BackupsRoute,
-  ExpensesRoute: ExpensesRoute,
-  MileageRoute: MileageRoute,
-  ScheduleRoute: ScheduleRoute,
-  EstimatesEstimateIdRoute: EstimatesEstimateIdRoute,
-  InvoicesInvoiceIdRoute: InvoicesInvoiceIdRoute,
-  JobsJobIdRoute: JobsJobIdRoute,
-  EstimatesIndexRoute: EstimatesIndexRoute,
-  InvoicesIndexRoute: InvoicesIndexRoute,
+  AuthenticatedBackupsRoute: AuthenticatedBackupsRoute,
+  AuthenticatedExpensesRoute: AuthenticatedExpensesRoute,
+  AuthenticatedMileageRoute: AuthenticatedMileageRoute,
+  AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
+  AuthenticatedTodayRoute: AuthenticatedTodayRoute,
+  AuthenticatedEstimatesEstimateIdRoute: AuthenticatedEstimatesEstimateIdRoute,
+  AuthenticatedInvoicesInvoiceIdRoute: AuthenticatedInvoicesInvoiceIdRoute,
+  AuthenticatedJobsJobIdRoute: AuthenticatedJobsJobIdRoute,
+  AuthenticatedEstimatesIndexRoute: AuthenticatedEstimatesIndexRoute,
+  AuthenticatedInvoicesIndexRoute: AuthenticatedInvoicesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
