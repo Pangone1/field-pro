@@ -37,6 +37,7 @@ export function estimateToInvoice(
     dueDate: opts.dueDate,
     paidAt: null,
     paidMethod: null,
+    stripeSessionId: null,
   };
 }
 
