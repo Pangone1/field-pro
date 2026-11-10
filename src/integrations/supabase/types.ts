@@ -14,7 +14,257 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      customers: {
+        Row: {
+          address: string
+          created_at: string
+          customer_since: string
+          email: string
+          equipment: Json
+          id: string
+          name: string
+          notes: string
+          phone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string
+          created_at?: string
+          customer_since?: string
+          email?: string
+          equipment?: Json
+          id?: string
+          name: string
+          notes?: string
+          phone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          customer_since?: string
+          email?: string
+          equipment?: Json
+          id?: string
+          name?: string
+          notes?: string
+          phone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      intake_tokens: {
+        Row: {
+          created_at: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          token?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      invoices: {
+        Row: {
+          created_at: string
+          customer_id: string | null
+          due_date: string
+          estimate_id: string | null
+          id: string
+          items: Json
+          job_id: string | null
+          number: string
+          paid_at: string | null
+          paid_method: string | null
+          status: string
+          stripe_session_id: string | null
+          tax_rate: number
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id?: string | null
+          due_date?: string
+          estimate_id?: string | null
+          id?: string
+          items?: Json
+          job_id?: string | null
+          number: string
+          paid_at?: string | null
+          paid_method?: string | null
+          status?: string
+          stripe_session_id?: string | null
+          tax_rate?: number
+          title: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string | null
+          due_date?: string
+          estimate_id?: string | null
+          id?: string
+          items?: Json
+          job_id?: string | null
+          number?: string
+          paid_at?: string | null
+          paid_method?: string | null
+          status?: string
+          stripe_session_id?: string | null
+          tax_rate?: number
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          activity: Json
+          address: string
+          checklist: Json
+          contact_phone: string
+          created_at: string
+          customer_id: string | null
+          customer_name: string
+          duration_hrs: number
+          id: string
+          notes: string
+          photos: Json
+          priority: string
+          scheduled_date: string | null
+          service_type: string
+          signature: string | null
+          source: string
+          start_hour: number
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity?: Json
+          address?: string
+          checklist?: Json
+          contact_phone?: string
+          created_at?: string
+          customer_id?: string | null
+          customer_name?: string
+          duration_hrs?: number
+          id?: string
+          notes?: string
+          photos?: Json
+          priority?: string
+          scheduled_date?: string | null
+          service_type?: string
+          signature?: string | null
+          source?: string
+          start_hour?: number
+          status?: string
+          title: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          activity?: Json
+          address?: string
+          checklist?: Json
+          contact_phone?: string
+          created_at?: string
+          customer_id?: string | null
+          customer_name?: string
+          duration_hrs?: number
+          id?: string
+          notes?: string
+          photos?: Json
+          priority?: string
+          scheduled_date?: string | null
+          service_type?: string
+          signature?: string | null
+          source?: string
+          start_hour?: number
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mileage_logs: {
+        Row: {
+          address_from: string
+          address_to: string
+          created_at: string
+          elapsed_seconds: number | null
+          end_at: string | null
+          end_odometer: number | null
+          id: string
+          purpose: string
+          start_at: string
+          start_odometer: number
+          user_id: string
+        }
+        Insert: {
+          address_from?: string
+          address_to?: string
+          created_at?: string
+          elapsed_seconds?: number | null
+          end_at?: string | null
+          end_odometer?: number | null
+          id?: string
+          purpose?: string
+          start_at?: string
+          start_odometer: number
+          user_id?: string
+        }
+        Update: {
+          address_from?: string
+          address_to?: string
+          created_at?: string
+          elapsed_seconds?: number | null
+          end_at?: string | null
+          end_odometer?: number | null
+          id?: string
+          purpose?: string
+          start_at?: string
+          start_odometer?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
