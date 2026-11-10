@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { computeTotals, money } from "@/lib/billing";
 import { useStore } from "@/lib/store";
 
-export const Route = createFileRoute("/invoices/")({
+export const Route = createFileRoute("/_authenticated/invoices/")({
   head: () => ({
     meta: [
       { title: "Invoices — FieldPro" },

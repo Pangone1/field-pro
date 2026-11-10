@@ -21,7 +21,7 @@ import { formatTime, fromDateKey } from "@/lib/links";
 import { useStore } from "@/lib/store";
 import type { PaymentMethod } from "@/lib/types";
 
-export const Route = createFileRoute("/invoices/$invoiceId")({
+export const Route = createFileRoute("/_authenticated/invoices/$invoiceId")({
   head: () => ({
     meta: [
       { title: "Invoice & Payment — FieldPro" },

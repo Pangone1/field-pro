@@ -9,7 +9,7 @@ import { computeTotals, money } from "@/lib/billing";
 import { useStore } from "@/lib/store";
 import type { EstimateStatus } from "@/lib/types";
 
-export const Route = createFileRoute("/estimates/")({
+export const Route = createFileRoute("/_authenticated/estimates/")({
   head: () => ({
     meta: [
       { title: "Estimates — FieldPro" },

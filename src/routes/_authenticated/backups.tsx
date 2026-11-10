@@ -5,7 +5,7 @@ import { Card, PageHeader } from "@/components/app/PageHeader";
 import { useStore } from "@/lib/store";
 import type { BackupProvider } from "@/lib/types";
 
-export const Route = createFileRoute("/backups")({
+export const Route = createFileRoute("/_authenticated/backups")({
   head: () => ({
     meta: [
       { title: "Data Backups — FieldPro" },

@@ -25,7 +25,7 @@ import { statusLabel, useStore } from "@/lib/store";
 import type { JobStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/jobs/$jobId")({
+export const Route = createFileRoute("/_authenticated/jobs/$jobId")({
   head: () => ({
     meta: [
       { title: "Job Details — FieldPro" },
@@ -54,7 +54,7 @@ function JobDetailsPage() {
       <div className="p-8 text-center">
         <p className="text-muted-foreground">This job isn't on your schedule.</p>
         <Button asChild variant="outline" className="mt-4">
-          <Link to="/">Back to today</Link>
+          <Link to="/today">Back to today</Link>
         </Button>
       </div>
     );
