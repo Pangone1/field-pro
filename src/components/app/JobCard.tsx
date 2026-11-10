@@ -8,6 +8,7 @@ import type { Job, JobStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export const statusVariant: Record<JobStatus, "secondary" | "info" | "warning" | "success"> = {
+  pending: "warning",
   scheduled: "secondary",
   en_route: "info",
   in_progress: "warning",

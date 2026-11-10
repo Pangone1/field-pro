@@ -8,7 +8,7 @@ import { money } from "@/lib/billing";
 import { fromDateKey, googleMapsDirections } from "@/lib/links";
 import { useStore } from "@/lib/store";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/today")({
   head: () => ({
     meta: [
       { title: "Today's Jobs — FieldPro" },

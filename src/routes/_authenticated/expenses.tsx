@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { money } from "@/lib/billing";
 import { useStore } from "@/lib/store";
 
-export const Route = createFileRoute("/expenses")({
+export const Route = createFileRoute("/_authenticated/expenses")({
   head: () => ({
     meta: [
       { title: "Expense Scanner — FieldPro" },

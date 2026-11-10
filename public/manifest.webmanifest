@@ -2,7 +2,7 @@
   "name": "FieldPro — Solo Contractor",
   "short_name": "FieldPro",
   "description": "Jobs, estimates, payments, mileage and time tracking for solo field service contractors.",
-  "start_url": "/",
+  "start_url": "/today",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",

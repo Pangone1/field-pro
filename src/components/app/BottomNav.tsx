@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { AppDrawer } from "./AppDrawer";
 
 const tabs = [
-  { to: "/", label: "Today", icon: ClipboardList, match: (p: string) => p === "/" || p.startsWith("/jobs") },
+  { to: "/today", label: "Today", icon: ClipboardList, match: (p: string) => p.startsWith("/today") || p.startsWith("/jobs") },
   { to: "/schedule", label: "Schedule", icon: CalendarDays, match: (p: string) => p.startsWith("/schedule") },
   {
     to: "/estimates",

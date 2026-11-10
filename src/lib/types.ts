@@ -1,4 +1,4 @@
-export type JobStatus = "scheduled" | "en_route" | "in_progress" | "completed";
+export type JobStatus = "pending" | "scheduled" | "en_route" | "in_progress" | "completed";
 
 export interface ServiceRecord {
   date: string; // yyyy-mm-dd
@@ -19,6 +19,7 @@ export interface Customer {
   name: string;
   phone: string;
   email: string;
+  address: string;
   customerSince: string;
   notes: string;
   equipment: Equipment[];
@@ -53,6 +54,8 @@ export interface Job {
   photos: JobPhoto[];
   signature: string | null;
   activity: { at: number; text: string }[];
+  /** Where the job came from: created in the app, or auto-created from an SMS/email request. */
+  source: "app" | "sms" | "email" | "webhook";
 }
 
 export interface LineItem {
@@ -86,7 +89,7 @@ export interface Estimate {
   invoiceId: string | null;
 }
 
-export type PaymentMethod = "nfc" | "card" | "ach";
+export type PaymentMethod = "stripe" | "cash" | "check" | "nfc" | "card" | "ach";
 
 export interface Invoice {
   id: string;
@@ -102,6 +105,7 @@ export interface Invoice {
   dueDate: string;
   paidAt: number | null;
   paidMethod: PaymentMethod | null;
+  stripeSessionId: string | null;
 }
 
 export type OutboxKind =
@@ -116,7 +120,9 @@ export type OutboxKind =
   | "expense"
   | "trip"
   | "timesheet"
-  | "schedule";
+  | "schedule"
+  | "job"
+  | "customer";
 
 export interface OutboxItem {
   id: string;
@@ -145,13 +151,16 @@ export interface Expense {
 export interface Trip {
   id: string;
   purpose: string;
+  addressFrom: string;
+  addressTo: string;
   startAt: number;
   startOdometer: number;
   endAt: number | null;
   endOdometer: number | null;
+  elapsedSeconds: number | null;
 }
 
-export type BackupProvider = "gdrive" | "onedrive" | "dropbox" | "box" | "mega";
+export type BackupProvider = "gdrive" | "onedrive" | "dropbox";
 
 export interface BackupState {
   status: "idle" | "running" | "done";

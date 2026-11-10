@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { formatDuration, formatTime } from "@/lib/links";
 import { useStore } from "@/lib/store";
 
-export const Route = createFileRoute("/mileage")({
+export const Route = createFileRoute("/_authenticated/mileage")({
   head: () => ({
     meta: [
       { title: "Mileage Tracker — FieldPro" },

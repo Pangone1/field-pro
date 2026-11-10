@@ -14,7 +14,7 @@ import { useStore } from "@/lib/store";
 import type { Estimate, LineItem, TierKey } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/estimates/$estimateId")({
+export const Route = createFileRoute("/_authenticated/estimates/$estimateId")({
   head: () => ({
     meta: [
       { title: "Estimate Builder — FieldPro" },
