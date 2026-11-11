@@ -274,3 +274,15 @@
     font-stretch: 112%;
   }
 }
+
+/* Google sign-in button — colors fixed by Google's branding guidelines. */
+.google-btn {
+  background: #ffffff;
+  color: #1f1f1f;
+  border: 1px solid #747775;
+}
+.dark .google-btn {
+  background: #131314;
+  color: #e3e3e3;
+  border-color: #8e918f;
+}
