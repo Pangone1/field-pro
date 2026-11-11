@@ -1,23 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, CreditCard, Landmark, Nfc } from "lucide-react";
-import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { Banknote, Check, CreditCard, Loader2, MessageSquareText, RefreshCw } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import { Card, PageHeader, Section } from "@/components/app/PageHeader";
 import { TotalsBlock } from "@/components/billing/BillingTabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
-import { Input } from "@/components/ui/input";
 import { computeTotals, lineTotal, money } from "@/lib/billing";
-import { formatTime, fromDateKey } from "@/lib/links";
+import { formatTime, fromDateKey, smsLink } from "@/lib/links";
+import { createInvoiceCheckout, refreshInvoicePayment } from "@/lib/payments.functions";
+import { invoiceFromRow } from "@/lib/rows";
 import { useStore } from "@/lib/store";
 import type { PaymentMethod } from "@/lib/types";
 
@@ -25,18 +20,22 @@ export const Route = createFileRoute("/_authenticated/invoices/$invoiceId")({
   head: () => ({
     meta: [
       { title: "Invoice & Payment — FieldPro" },
-      { name: "description", content: "Invoice summary with line items, taxes and mobile payment options." },
+      { name: "description", content: "Invoice summary with line items, taxes and Stripe card payments." },
       { property: "og:title", content: "Invoice & Payment — FieldPro" },
-      { property: "og:description", content: "Invoice summary with line items, taxes and mobile payment options." },
+      { property: "og:description", content: "Invoice summary with line items, taxes and Stripe card payments." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),
+  validateSearch: z.object({ paid: z.coerce.number().optional() }),
   component: InvoicePage,
 });
 
 const METHOD_LABEL: Record<PaymentMethod, string> = {
+  stripe: "Card via Stripe",
+  cash: "Cash",
+  check: "Check",
   nfc: "Tap-to-Pay (NFC)",
   card: "Manual Card Entry",
   ach: "ACH Transfer",
@@ -44,10 +43,39 @@ const METHOD_LABEL: Record<PaymentMethod, string> = {
 
 function InvoicePage() {
   const { invoiceId } = Route.useParams();
+  const { paid: returnedFromStripe } = Route.useSearch();
   const store = useStore();
   const inv = store.invoices.find((i) => i.id === invoiceId);
-  const [method, setMethod] = useState<PaymentMethod | null>(null);
-  const [processing, setProcessing] = useState(false);
+  const [busy, setBusy] = useState<null | "checkout" | "text" | "refresh">(null);
+  const createCheckout = useServerFn(createInvoiceCheckout);
+  const refreshPayment = useServerFn(refreshInvoicePayment);
+  const checkedReturn = useRef(false);
+
+  const refresh = async (quiet = false) => {
+    setBusy("refresh");
+    try {
+      const res = await refreshPayment({ data: { invoiceId } });
+      if (!res.ok) {
+        if (!quiet) toast.error(res.error);
+        return;
+      }
+      store.replaceInvoice(invoiceFromRow(res.row));
+      if (res.paid) toast.success("Payment received through Stripe");
+      else if (!quiet) toast("No payment yet", { description: "The customer hasn't finished paying." });
+    } catch {
+      if (!quiet) toast.error("Couldn't reach Stripe. Try again.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  // Back from Stripe Checkout → confirm the payment straight away.
+  useEffect(() => {
+    if (returnedFromStripe && !checkedReturn.current && inv?.status === "unpaid") {
+      checkedReturn.current = true;
+      void refresh(true);
+    }
+  }); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!inv) {
     return (
@@ -63,16 +91,59 @@ function InvoicePage() {
   const customer = store.customers.find((c) => c.id === inv.customerId);
   const totals = computeTotals(inv.items, inv.taxRate);
 
-  // Simulated processing — replace with your payment provider.
-  const pay = () => {
-    if (!method) return;
-    setProcessing(true);
-    setTimeout(() => {
-      store.payInvoice(inv.id, method);
-      setProcessing(false);
-      setMethod(null);
-      toast.success(`Payment of ${money(totals.total)} received`);
-    }, 1600);
+  const getCheckoutUrl = async (): Promise<string | null> => {
+    const res = await createCheckout({ data: { invoiceId: inv.id, origin: window.location.origin } });
+    if (!res.ok) {
+      toast.error(res.error);
+      return null;
+    }
+    store.replaceInvoice({ ...inv, stripeSessionId: "pending" });
+    return res.url;
+  };
+
+  const collectNow = async () => {
+    // Open the tab synchronously so phones don't block it as a pop-up.
+    const tab = window.open("", "_blank");
+    setBusy("checkout");
+    try {
+      const url = await getCheckoutUrl();
+      if (!url) {
+        tab?.close();
+        return;
+      }
+      if (tab) tab.location.href = url;
+      else window.location.href = url;
+    } catch {
+      tab?.close();
+      toast.error("Couldn't start the Stripe payment. Try again.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const textLink = async () => {
+    if (!customer?.phone) {
+      toast.error("Add a phone number to this customer to text the link.");
+      return;
+    }
+    setBusy("text");
+    try {
+      const url = await getCheckoutUrl();
+      if (!url) return;
+      window.location.href = smsLink(
+        customer.phone,
+        `Hi ${customer.name.split(" ")[0]}, here's your secure payment link for ${inv.number} (${money(totals.total)}): ${url}`,
+      );
+    } catch {
+      toast.error("Couldn't create the payment link. Try again.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const recordManual = (method: "cash" | "check") => {
+    store.payInvoice(inv.id, method);
+    toast.success(`${money(totals.total)} recorded as ${METHOD_LABEL[method].toLowerCase()}`);
   };
 
   return (
@@ -134,61 +205,34 @@ function InvoicePage() {
             <div className="eyebrow">Total due</div>
             <div className="tabular text-4xl font-bold">{money(totals.total)}</div>
             <div className="mt-4 space-y-2">
-              <Button variant="signal" size="xl" className="w-full" onClick={() => setMethod("nfc")}>
-                <Nfc /> Tap-to-Pay (NFC)
+              <Button variant="signal" size="xl" className="w-full" disabled={!store.online || busy !== null} onClick={collectNow}>
+                {busy === "checkout" ? <Loader2 className="animate-spin" /> : <CreditCard />} Collect card payment
               </Button>
-              <Button variant="outline" size="lg" className="w-full" onClick={() => setMethod("card")}>
-                <CreditCard /> Manual Card Entry
+              <Button variant="outline" size="lg" className="w-full" disabled={!store.online || busy !== null} onClick={textLink}>
+                {busy === "text" ? <Loader2 className="animate-spin" /> : <MessageSquareText />} Text payment link
               </Button>
-              <Button variant="outline" size="lg" className="w-full" onClick={() => setMethod("ach")}>
-                <Landmark /> ACH Transfer
-              </Button>
+              {inv.stripeSessionId && (
+                <Button variant="ghost" size="lg" className="w-full" disabled={!store.online || busy !== null} onClick={() => refresh()}>
+                  {busy === "refresh" ? <Loader2 className="animate-spin" /> : <RefreshCw />} Check payment status
+                </Button>
+              )}
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <Button variant="outline" onClick={() => recordManual("cash")} disabled={busy !== null}>
+                  <Banknote /> Cash
+                </Button>
+                <Button variant="outline" onClick={() => recordManual("check")} disabled={busy !== null}>
+                  <Check /> Check
+                </Button>
+              </div>
             </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              {store.online
+                ? "Card payments open a secure Stripe page — hand your phone to the customer or text them the link."
+                : "Card payments need signal. Cash and check can be recorded offline."}
+            </p>
           </Card>
         )}
       </Section>
-
-      <Drawer open={method !== null} onOpenChange={(o) => !o && !processing && setMethod(null)} shouldScaleBackground={false}>
-        <DrawerContent className="mx-auto max-w-md">
-          <DrawerHeader className="text-left">
-            <DrawerTitle className="font-display">{method ? METHOD_LABEL[method] : ""}</DrawerTitle>
-            <DrawerDescription className="tabular">Charging {money(totals.total)}</DrawerDescription>
-          </DrawerHeader>
-          <div className="space-y-2 px-4">
-            {method === "nfc" && (
-              <div className="flex flex-col items-center gap-3 py-6">
-                <div className="relative flex size-24 items-center justify-center rounded-full bg-accent text-primary">
-                  <span className="absolute inset-0 rounded-full border-2 border-primary animate-nfc" />
-                  <Nfc className="size-10" />
-                </div>
-                <p className="text-sm text-muted-foreground">Hold the card or phone near the back of your device</p>
-              </div>
-            )}
-            {method === "card" && (
-              <>
-                <Input placeholder="Card number" inputMode="numeric" className="h-11 rounded-xl" />
-                <div className="grid grid-cols-3 gap-2">
-                  <Input placeholder="MM/YY" inputMode="numeric" className="h-11 rounded-xl" />
-                  <Input placeholder="CVC" inputMode="numeric" className="h-11 rounded-xl" />
-                  <Input placeholder="ZIP" inputMode="numeric" className="h-11 rounded-xl" />
-                </div>
-              </>
-            )}
-            {method === "ach" && (
-              <>
-                <Input placeholder="Account holder name" className="h-11 rounded-xl" />
-                <Input placeholder="Routing number" inputMode="numeric" className="h-11 rounded-xl" />
-                <Input placeholder="Account number" inputMode="numeric" className="h-11 rounded-xl" />
-              </>
-            )}
-          </div>
-          <DrawerFooter>
-            <Button variant="success" size="xl" disabled={processing} onClick={pay}>
-              {processing ? "Processing…" : method === "nfc" ? "Simulate tap" : `Charge ${money(totals.total)}`}
-            </Button>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
     </div>
   );
 }
