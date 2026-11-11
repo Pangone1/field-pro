@@ -88,7 +88,7 @@ export function OutboxButton() {
           </DrawerTitle>
           <DrawerDescription>
             {online
-              ? "You're online. Pending changes are ready to upload."
+              ? "You're online. Anything left here will upload automatically."
               : "You're offline. These changes will upload when signal returns."}
           </DrawerDescription>
         </DrawerHeader>
@@ -112,9 +112,10 @@ export function OutboxButton() {
             variant={online ? "signal" : "secondary"}
             size="lg"
             disabled={!online || count === 0}
-            onClick={() => {
-              flushOutbox();
-              toast.success(`Uploaded ${count} change${count === 1 ? "" : "s"}`);
+            onClick={async () => {
+              const { sent, remaining } = await flushOutbox();
+              if (sent > 0) toast.success(`Uploaded ${sent} change${sent === 1 ? "" : "s"}`);
+              if (remaining > 0) toast.error(`${remaining} change${remaining === 1 ? "" : "s"} couldn't upload yet`);
             }}
           >
             {online ? <RefreshCw /> : <CloudOff />}

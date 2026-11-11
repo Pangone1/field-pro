@@ -1,17 +1,26 @@
-import { Link } from "@tanstack/react-router";
-import { ChevronRight, DatabaseBackup, FileText, Moon, ReceiptText, Signal, Sun } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { ChevronRight, DatabaseBackup, FileText, Inbox, LogOut, Moon, ReceiptText, Signal, Sun } from "lucide-react";
 import { toast } from "sonner";
 
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Switch } from "@/components/ui/switch";
 import { formatDuration, formatTime } from "@/lib/links";
-import { useStore } from "@/lib/store";
+import { supabase } from "@/integrations/supabase/client";
+import { clearOfflineData, useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { useNow } from "./TopBar";
 
 export function AppDrawer({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
-  const { clockedIn, toggleClock, timeEntries, theme, setTheme, simulateOffline, setSimulateOffline, networkOnline } =
+  const { clockedIn, toggleClock, timeEntries, theme, setTheme, simulateOffline, setSimulateOffline, networkOnline, email, outbox } =
     useStore();
+  const navigate = useNavigate();
+  const signOut = async () => {
+    if (outbox.length > 0 && !window.confirm(`${outbox.length} change(s) haven't uploaded yet and will be lost. Sign out anyway?`)) return;
+    await supabase.auth.signOut();
+    await clearOfflineData();
+    onOpenChange(false);
+    void navigate({ to: "/auth" });
+  };
   const now = useNow();
   const openEntry = timeEntries.find((e) => e.clockOut === null);
   const workedMs = timeEntries.reduce((sum, e) => sum + ((e.clockOut ?? now) - e.clockIn), 0);
@@ -19,7 +28,8 @@ export function AppDrawer({ open, onOpenChange }: { open: boolean; onOpenChange:
   const links = [
     { to: "/invoices", label: "Invoices", icon: FileText },
     { to: "/expenses", label: "Expense Scanner", icon: ReceiptText },
-    { to: "/backups", label: "Data Backups", icon: DatabaseBackup },
+    { to: "/intake", label: "Text & Email Job Intake", icon: Inbox },
+    { to: "/backups", label: "Cloud Backup Hub", icon: DatabaseBackup },
   ] as const;
 
   return (
@@ -99,6 +109,16 @@ export function AppDrawer({ open, onOpenChange }: { open: boolean; onOpenChange:
               </span>
               <Switch checked={simulateOffline} onCheckedChange={setSimulateOffline} />
             </label>
+          </section>
+
+          <section className="overflow-hidden rounded-2xl border bg-card">
+            <button onClick={signOut} className="flex w-full items-center gap-3 px-4 py-3.5 text-left text-sm font-semibold">
+              <LogOut className="size-5 text-primary" />
+              <span className="flex-1">
+                Sign out
+                <span className="block truncate text-xs font-normal text-muted-foreground">{email}</span>
+              </span>
+            </button>
           </section>
         </div>
       </DrawerContent>
