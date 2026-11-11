@@ -90,10 +90,10 @@ export async function loadSnapshot(userId: string): Promise<CloudSnapshot> {
     const err = customers.error ?? jobs.error ?? invoices.error ?? trips.error;
     if (err) throw new Error(err.message);
     const snap: CloudSnapshot = {
-      customers: customers.data,
-      jobs: jobs.data,
-      invoices: invoices.data,
-      mileage_logs: trips.data,
+      customers: customers.data ?? [],
+      jobs: jobs.data ?? [],
+      invoices: invoices.data ?? [],
+      mileage_logs: trips.data ?? [],
       fromCache: false,
     };
     const savedAt = Date.now();

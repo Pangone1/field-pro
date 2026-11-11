@@ -18,7 +18,7 @@ async function stripe<T>(path: string, init: { method: "GET" | "POST"; form?: Re
       Authorization: `Bearer ${key}`,
       ...(init.form ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
     },
-    body: init.form ? new URLSearchParams(init.form).toString() : undefined,
+    body: init.form ? new URLSearchParams(init.form).toString() : null,
   });
   const body = (await res.json().catch(() => ({}))) as { error?: { message?: string } } & T;
   if (!res.ok) {

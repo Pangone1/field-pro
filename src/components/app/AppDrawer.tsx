@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ChevronRight, DatabaseBackup, FileText, Inbox, LogOut, Moon, ReceiptText, Signal, Sun } from "lucide-react";
+import { ChevronRight, DatabaseBackup, FileText, LogOut, Moon, ReceiptText, Signal, Sun } from "lucide-react";
 import { toast } from "sonner";
 
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
@@ -28,7 +28,6 @@ export function AppDrawer({ open, onOpenChange }: { open: boolean; onOpenChange:
   const links = [
     { to: "/invoices", label: "Invoices", icon: FileText },
     { to: "/expenses", label: "Expense Scanner", icon: ReceiptText },
-    { to: "/intake", label: "Text & Email Job Intake", icon: Inbox },
     { to: "/backups", label: "Cloud Backup Hub", icon: DatabaseBackup },
   ] as const;
 
