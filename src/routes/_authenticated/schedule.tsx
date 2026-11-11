@@ -11,12 +11,13 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, GripVertical, Navigation } from "lucide-react";
+import { ChevronLeft, ChevronRight, GripVertical, Navigation, Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/app/PageHeader";
-import { addDays, formatHour, fromDateKey, googleMapsDirections } from "@/lib/links";
+import { NewJobDialog } from "@/components/job/NewJobDialog";
+import { addDays, formatHour, fromDateKey, googleMapsDirections, toDateKey } from "@/lib/links";
 import { useStore } from "@/lib/store";
 import type { Job } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -41,7 +42,8 @@ const SLOT_PX = 34; // per half hour
 
 function SchedulePage() {
   const { jobs, today, rescheduleJob, customers } = useStore();
-  const [view, setView] = useState<"day" | "week">("day");
+  const [view, setView] = useState<"day" | "week" | "month">("day");
+  const [newJobOpen, setNewJobOpen] = useState(false);
   const [day, setDay] = useState(today);
   const [dragging, setDragging] = useState<Job | null>(null);
 
@@ -83,25 +85,50 @@ function SchedulePage() {
   return (
     <div>
       <PageHeader
-        eyebrow={view === "day" ? "Daily calendar" : "Weekly calendar"}
+        eyebrow={view === "day" ? "Daily calendar" : view === "week" ? "Weekly calendar" : "Monthly calendar"}
         title="Schedule"
         action={
-          <div className="flex rounded-lg bg-muted p-1 text-xs font-bold">
-            {(["day", "week"] as const).map((v) => (
+          <div className="flex items-center rounded-lg bg-muted p-1 text-xs font-bold">
+            {(["day", "week", "month"] as const).map((v) => (
               <button
                 key={v}
                 onClick={() => setView(v)}
                 className={cn(
-                  "rounded-md px-3 py-1.5 capitalize transition-colors",
+                  "rounded-md px-2.5 py-1.5 capitalize transition-colors",
                   view === v ? "bg-card text-foreground shadow-sm" : "text-muted-foreground",
                 )}
               >
                 {v}
               </button>
             ))}
+            <button
+              onClick={() => setNewJobOpen(true)}
+              aria-label="New job"
+              className="ml-1 flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground"
+            >
+              <Plus className="size-4" strokeWidth={2.6} />
+            </button>
           </div>
         }
       />
+      <NewJobDialog open={newJobOpen} onOpenChange={setNewJobOpen} defaultDate={day} />
+
+      {view === "month" ? (
+        <MonthGrid
+          day={day}
+          today={today}
+          jobs={jobs}
+          onPick={(d) => {
+            setDay(d);
+            setView("day");
+          }}
+          onShift={(n) => {
+            const d = fromDateKey(day);
+            setDay(toDateKey(new Date(d.getFullYear(), d.getMonth() + n, 1)));
+          }}
+        />
+      ) : (
+      <>
 
       {/* Date strip */}
       <div className="flex items-center gap-1 px-2">
@@ -173,6 +200,77 @@ function SchedulePage() {
           )}
         </DragOverlay>
       </DndContext>
+      </>
+      )}
+    </div>
+  );
+}
+
+function MonthGrid({
+  day,
+  today,
+  jobs,
+  onPick,
+  onShift,
+}: {
+  day: string;
+  today: string;
+  jobs: Job[];
+  onPick: (d: string) => void;
+  onShift: (months: number) => void;
+}) {
+  const sel = fromDateKey(day);
+  const first = new Date(sel.getFullYear(), sel.getMonth(), 1);
+  const lead = (first.getDay() + 6) % 7; // Monday-first
+  const daysInMonth = new Date(sel.getFullYear(), sel.getMonth() + 1, 0).getDate();
+  const cells = Array.from({ length: Math.ceil((lead + daysInMonth) / 7) * 7 }, (_, i) => {
+    const n = i - lead + 1;
+    return n >= 1 && n <= daysInMonth ? toDateKey(new Date(sel.getFullYear(), sel.getMonth(), n)) : null;
+  });
+  return (
+    <div className="px-4">
+      <div className="mb-2 flex items-center justify-between">
+        <button aria-label="Previous month" onClick={() => onShift(-1)} className="flex size-9 items-center justify-center rounded-full hover:bg-muted">
+          <ChevronLeft className="size-5" />
+        </button>
+        <div className="font-display text-base font-extrabold">
+          {first.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+        </div>
+        <button aria-label="Next month" onClick={() => onShift(1)} className="flex size-9 items-center justify-center rounded-full hover:bg-muted">
+          <ChevronRight className="size-5" />
+        </button>
+      </div>
+      <div className="overflow-hidden rounded-2xl border bg-card shadow-card">
+        <div className="grid grid-cols-7 border-b bg-muted/50 text-center text-[10px] font-semibold uppercase text-muted-foreground">
+          {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
+            <div key={i} className="py-1.5">
+              {d}
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7">
+          {cells.map((d, i) => {
+            if (!d) return <div key={i} className="aspect-square border-b border-r last:border-r-0" />;
+            const count = jobs.filter((j) => j.date === d).length;
+            return (
+              <button
+                key={d}
+                onClick={() => onPick(d)}
+                className={cn(
+                  "flex aspect-square flex-col items-center justify-start gap-1 border-b border-r pt-1.5 transition-colors hover:bg-muted",
+                  d === day && "bg-accent",
+                )}
+              >
+                <span className={cn("tabular text-sm font-bold", d === today && "text-primary")}>{fromDateKey(d).getDate()}</span>
+                {count > 0 && (
+                  <span className="tabular rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">{count}</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <p className="pt-3 text-xs text-muted-foreground">Tap a day to open its calendar.</p>
     </div>
   );
 }
