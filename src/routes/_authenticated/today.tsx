@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Navigation, Plus, Route as RouteIcon } from "lucide-react";
+import { Inbox, Navigation, Plus, Route as RouteIcon } from "lucide-react";
+import { useState } from "react";
 
 import { JobCard } from "@/components/app/JobCard";
+import { NewJobDialog } from "@/components/job/NewJobDialog";
 import { PageHeader, Section } from "@/components/app/PageHeader";
 import { Button } from "@/components/ui/button";
 import { money } from "@/lib/billing";
-import { fromDateKey, googleMapsDirections } from "@/lib/links";
+import { fromDateKey, googleMapsDirections, toDateKey } from "@/lib/links";
 import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/_authenticated/today")({
@@ -23,13 +25,15 @@ export const Route = createFileRoute("/_authenticated/today")({
 });
 
 function TodayPage() {
-  const { jobs, today, invoices, trips, estimates } = useStore();
-  const todays = jobs.filter((j) => j.date === today).sort((a, b) => a.startHour - b.startHour);
+  const { jobs, today, invoices, trips, estimates, customers } = useStore();
+  const [newJobOpen, setNewJobOpen] = useState(false);
+  const requests = jobs.filter((j) => j.status === "pending");
+  const todays = jobs.filter((j) => j.date === today && j.status !== "pending").sort((a, b) => a.startHour - b.startHour);
   const remaining = todays.filter((j) => j.status !== "completed");
   const next = remaining[0];
   const unpaid = invoices.filter((i) => i.status === "unpaid").length;
   const miles = trips
-    .filter((t) => t.endOdometer !== null)
+    .filter((t) => t.endOdometer !== null && toDateKey(new Date(t.startAt)) === today)
     .reduce((s, t) => s + ((t.endOdometer ?? 0) - t.startOdometer), 0);
   const pipeline = estimates
     .filter((e) => e.status === "draft" || e.status === "sent")
@@ -60,13 +64,46 @@ function TodayPage() {
     <div>
       <PageHeader eyebrow={dateLabel} title="Today's jobs" />
 
-      <div className="grid grid-cols-3 gap-2 px-4">
+      <div className="flex items-center justify-between gap-2 px-4">
         <Stat label="Stops left" value={`${remaining.length}/${todays.length}`} />
         <Stat label="Miles" value={miles.toFixed(1)} />
-        <Link to="/invoices" className="block">
+        <Link to="/invoices" className="block min-w-0 flex-1">
           <Stat label="Unpaid inv." value={String(unpaid)} />
         </Link>
+        <button
+          onClick={() => setNewJobOpen(true)}
+          aria-label="New job"
+          className="flex w-14 shrink-0 self-stretch items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-glow transition-transform active:scale-95"
+        >
+          <Plus className="size-6" strokeWidth={2.6} />
+        </button>
       </div>
+      <NewJobDialog open={newJobOpen} onOpenChange={setNewJobOpen} />
+
+      {requests.length > 0 && (
+        <Section title={`New requests · ${requests.length}`}>
+          <div className="space-y-2">
+            {requests.map((j) => (
+              <Link
+                key={j.id}
+                to="/jobs/$jobId"
+                params={{ jobId: j.id }}
+                className="flex items-center gap-3 rounded-2xl border border-warning/40 bg-warning/10 p-3"
+              >
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-warning text-warning-foreground">
+                  <Inbox className="size-[18px]" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-bold">{j.title}</div>
+                  <div className="truncate text-xs text-muted-foreground">
+                    {customers.find((c) => c.id === j.customerId)?.name ?? "New customer"} · via {j.source === "app" ? "app" : j.source.toUpperCase()}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </Section>
+      )}
 
       {next && (
         <div className="px-4 pt-4">
@@ -102,6 +139,16 @@ function TodayPage() {
         }
       >
         <div className="space-y-3">
+          {todays.length === 0 && (
+            <button
+              onClick={() => setNewJobOpen(true)}
+              className="flex w-full flex-col items-center gap-1 rounded-2xl border border-dashed bg-card p-6 text-center"
+            >
+              <Plus className="size-6 text-primary" />
+              <span className="text-sm font-semibold">No jobs today</span>
+              <span className="text-xs text-muted-foreground">Tap to add your first stop</span>
+            </button>
+          )}
           {todays.map((job, i) => (
             <JobCard key={job.id} job={job} index={i} />
           ))}
@@ -122,7 +169,7 @@ function TodayPage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border bg-card px-3 py-2.5 shadow-card">
+    <div className="min-w-0 flex-1 rounded-xl border bg-card px-3 py-2.5 shadow-card">
       <div className="tabular text-xl font-bold">{value}</div>
       <div className="text-[11px] text-muted-foreground">{label}</div>
     </div>

@@ -12,10 +12,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { BottomNav } from "@/components/app/BottomNav";
-import { TopBar } from "@/components/app/TopBar";
-import { Toaster } from "@/components/ui/sonner";
-import { StoreProvider, useStore } from "@/lib/store";
+import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -28,7 +25,7 @@ function NotFoundComponent() {
         </p>
         <div className="mt-6">
           <Link
-            to="/"
+            to="/today"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Go home
@@ -137,38 +134,23 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
-function Splash() {
-  return (
-    <div className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-background">
-      <img src="/icon-192.png" alt="" width={72} height={72} className="size-18 rounded-2xl" />
-      <div className="font-display text-lg font-extrabold">FieldPro</div>
-      <div className="h-1 w-24 overflow-hidden rounded-full bg-muted">
-        <div className="hazard-strip h-full w-full animate-pulse" />
-      </div>
-    </div>
-  );
-}
-
-function AppToaster() {
-  const { theme } = useStore();
-  return <Toaster theme={theme} position="top-center" offset={64} />;
-}
-
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  // React only to identity changes; token refreshes would otherwise thrash the router.
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      void router.invalidate();
+      if (event !== "SIGNED_OUT") void queryClient.invalidateQueries();
+    });
+    return () => data.subscription.unsubscribe();
+  }, [router, queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <StoreProvider splash={<Splash />}>
-        <div className="relative mx-auto min-h-dvh max-w-md bg-background sm:border-x">
-          <TopBar />
-          <main className="pb-28">
-            <Outlet />
-          </main>
-          <BottomNav />
-        </div>
-        <AppToaster />
-      </StoreProvider>
+      <Outlet />
     </QueryClientProvider>
   );
 }
