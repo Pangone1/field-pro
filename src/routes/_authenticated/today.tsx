@@ -73,7 +73,7 @@ function TodayPage() {
         <button
           onClick={() => setNewJobOpen(true)}
           aria-label="New job"
-          className="flex size-[58px] shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-glow transition-transform active:scale-95"
+          className="flex w-14 shrink-0 self-stretch items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-glow transition-transform active:scale-95"
         >
           <Plus className="size-6" strokeWidth={2.6} />
         </button>
