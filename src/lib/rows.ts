@@ -1,4 +1,4 @@
-import type { Database } from "@/integrations/supabase/types";
+import type { Database, Json } from "@/integrations/supabase/types";
 
 import type { ChecklistItem, Customer, Equipment, Invoice, Job, JobPhoto, JobStatus, LineItem, PaymentMethod, Trip } from "./types";
 
@@ -56,7 +56,7 @@ export function customerToRow(c: Customer): CustomerInsert {
     address: c.address,
     customer_since: c.customerSince,
     notes: c.notes,
-    equipment: c.equipment as unknown as CustomerInsert["equipment"],
+    equipment: c.equipment as unknown as Json,
   };
 }
 
@@ -95,11 +95,11 @@ export function jobToRow(j: Job, customerName: string): JobInsert {
     duration_hrs: j.durationHrs,
     status: j.status,
     priority: j.priority,
-    checklist: j.checklist as unknown as JobInsert["checklist"],
+    checklist: j.checklist as unknown as Json,
     notes: j.notes,
-    photos: j.photos as unknown as JobInsert["photos"],
+    photos: j.photos as unknown as Json,
     signature: j.signature,
-    activity: j.activity as unknown as JobInsert["activity"],
+    activity: j.activity as unknown as Json,
     source: j.source,
   };
 }
@@ -131,13 +131,13 @@ export function invoiceToRow(i: Invoice): InvoiceInsert {
     job_id: i.jobId,
     estimate_id: i.estimateId,
     title: i.title,
-    items: i.items as unknown as InvoiceInsert["items"],
+    items: i.items as unknown as Json,
     tax_rate: i.taxRate,
     status: i.status,
     due_date: i.dueDate,
     paid_at: iso(i.paidAt),
     paid_method: i.paidMethod,
-    created_at: iso(i.createdAt) ?? undefined,
+    created_at: new Date(i.createdAt).toISOString(),
   };
 }
 
@@ -161,7 +161,7 @@ export function tripToRow(t: Trip): MileageInsert {
     purpose: t.purpose,
     address_from: t.addressFrom,
     address_to: t.addressTo,
-    start_at: iso(t.startAt) ?? undefined,
+    start_at: new Date(t.startAt).toISOString(),
     end_at: iso(t.endAt),
     start_odometer: t.startOdometer,
     end_odometer: t.endOdometer,
